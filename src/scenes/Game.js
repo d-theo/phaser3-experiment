@@ -12,6 +12,12 @@ export default class extends Phaser.Scene {
   init () {}
   preload () {
     this.load.image('map', 'assets/map/map.png');
+    
+    this.load.spritesheet('sprite_map', 
+        'assets/map/map.png',
+        { frameWidth: 18, frameHeight: 18 }
+    );
+
     this.load.tilemapTiledJSON({
       key: 'tileMap',
       url: 'assets/map/map.json'
@@ -35,17 +41,25 @@ export default class extends Phaser.Scene {
     this.mario = this.physics.add.sprite(100,100,'smb', 'bend.png');
     this.mario.body.setMaxVelocity(100, 500);
     this.mario.anims.play(IMAGES.mario.walk.key);
-    this.physics.add.collider(this.mario, this.layer, () => {
-      console.log('??');
-    });
-    this.g = this.add.group('coin-object');
+    this.physics.add.collider(this.mario, this.layer);
+    
+    
     const chances = this.tilemap.createFromTiles(40, 0, {
       key: 'smb', frame: 'bend.png'
     });
+    const group = this.physics.add.group({immovable: true});
+    //this.physics.world.enable(chances);
     chances.forEach((c) => {
-      c.setOrigin(0);
-    }); 
-
+      group.add(c);
+      c.setOrigin(0, 0);
+      c.body.setOffset(8,8);
+      //c.body.
+      //c.body.refreshBody();
+      c.body.moves = false;
+      c.body.immovable = true;
+      //c.allowGravity = false;
+    });
+    this.physics.add.collider(this.mario, group);
 
 
     this.keys = this.input.keyboard.createCursorKeys();
