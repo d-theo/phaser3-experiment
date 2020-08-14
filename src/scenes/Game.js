@@ -35,7 +35,18 @@ export default class extends Phaser.Scene {
     this.mario = this.physics.add.sprite(100,100,'smb', 'bend.png');
     this.mario.body.setMaxVelocity(100, 500);
     this.mario.anims.play(IMAGES.mario.walk.key);
-    this.physics.add.collider(this.mario, this.layer);
+    this.physics.add.collider(this.mario, this.layer, () => {
+      console.log('??');
+    });
+    this.g = this.add.group('coin-object');
+    const chances = this.tilemap.createFromTiles(40, 0, {
+      key: 'smb', frame: 'bend.png'
+    });
+    chances.forEach((c) => {
+      c.setOrigin(0);
+    }); 
+
+
 
     this.keys = this.input.keyboard.createCursorKeys();
     this.canJump = true;
@@ -52,7 +63,6 @@ export default class extends Phaser.Scene {
   update(t,t2) {
     this.timer += t2;
     if ((this.timer <= 103 && this.timer >= 97) && this.jumping) {
-      console.log(this.timer, this.jumping);
       this.jumping = false;
       this.canJump = false;
     }
