@@ -6,15 +6,63 @@ Idle
 Running
 Attacking
 */
-import {GrulitaFrames} from '../../animations/grulita';
 
+export class AttackingState {
+    constructor(char, type) {
+        this.isFinished = false;
+        this.char = char;
+        this.type = type;
+        const len = {
+            attackA : 350,
+            attackB : 350,
+            attackC : 350,
+            attackD : 350,
+        }[type]
+        this.attackLenght = len;
+        console.log(this.constructor.name);
+
+        this.init();
+    }
+    init() {
+        console.log(this.type);
+        this.char.anims.play(this.type);
+        setTimeout(() => this.isFinished = true, this.attackLenght);
+    }
+    rest() {
+        if (this.isFinished) {
+            this.char.state = new IdleState(this.char);
+        }
+    }
+    jump() {
+        if (this.isFinished) {
+            this.char.state = new AscendingState(this.char);
+        }
+    }
+    runRight() {
+        if (this.isFinished) {
+            this.char.state = new RunningRightState(this.char);
+        }
+    }
+    runLeft() {
+        if (this.isFinished) {
+            this.char.state = new RunningLeftState(this.char);
+        }
+    }
+    attack() {
+        
+    }
+    interuptJump() {}
+    land(){}
+}
 export class RunningLeftState {
     constructor(char) {
         this.char = char;
         this.init();
+        console.log(this.constructor.name)
     }
     init() {
-        // animate ect..
+        this.char.flipX = true;
+        this.char.anims.play('run');
     }
     rest() {
         this.char.state = new IdleState(this.char);
@@ -23,83 +71,185 @@ export class RunningLeftState {
         this.char.state = new AscendingState(this.char);
     }
     runRight() {
-        this.char.state = new RunRightState(this.char);
+        this.char.state = new RunningRightState(this.char);
     }
-    runleft() {
-        this.char.state = new RunLeftState(this.char);
+    runLeft() {
+        this.char.body.setAccelerationX(-130);
+        if (this.char.body.velocity.x > 10) {
+            this.char.body.setVelocityX(+12);
+        }
     }
-    attacking() {
-        this.char.state = new AttackingState(this.char);
+    attack(type) {
+        this.char.state = new AttackingState(this.char, type);
     }
+    interuptJump() {}
+    land(){}
 }
 export class RunningRightState {
     constructor(char) {
         this.char = char;
         this.init();
+        console.log(this.constructor.name)
     }
     init() {
-        // animate ect..
+        this.char.flipX = false;
+        this.char.anims.play("run");
     }
     rest() {
-        // animn then idle ? rest timer
+        this.char.state = new IdleState(this.char);
     }
-    jump() {}
-    runRight() {}
-    runleft() {}
-    attacking() {}
+    jump() {
+        this.char.state = new AscendingState(this.char);
+    }
+    runRight() {
+        if (this.char.body.velocity.x < -10) {
+            this.char.body.setVelocityX(-12);
+        }
+        this.char.body.setAccelerationX(+130);
+    }
+    runLeft() {}
+    attack(type) {
+        this.char.state = new AttackingState(this.char,type);
+    }
+    interuptJump() {}
+    land(){}
 }
 export class LandingState {
     constructor(char) {
         this.char = char;
+        this.call = 5;
         this.init();
+        console.log(this.constructor.name)
     }
     init() {
-        // animate ect..
+        this.char.setTexture('grulita_atlas', 'jump_landing.png')
+
+        // TODO c moche
+        this.char.body.setAccelerationX(0);
+        this._rest();
+    }
+    _rest() {
+        this.char.body.setAccelerationX(0);
+        if (this.char.body.velocity.x > 10) {
+            this.char.body.setVelocityX(this.char.body.velocity.x - 4);
+        } else if (this.char.body.velocity.x < -10) {
+            this.char.body.setVelocityX(this.char.body.velocity.x + 4);
+        } else {
+            this.char.setVelocityX(0);
+        }
     }
     rest() {
-        // animn then idle ? rest timer
+        this._rest();
+        this.call --;
+        if (this.call <= 0) {
+            this.char.state = new IdleState(this.char);
+        }
     }
-    jump() {}
-    runRight() {}
-    runleft() {}
-    attacking() {}
+    land(){
+        this._rest();
+    }
+    jump() {
+        this._rest();
+        this.call --;
+        if (this.call <= 0) {
+            this.char.state = new AscendingState(this.char);
+        }
+    }
+    runRight() {
+        this._rest();
+        this.call --;
+        if (this.call <= 0) {
+            this.char.state = new RunningRightState(this.char);
+        }
+    }
+    runLeft() {
+        this._rest();
+        this.call --;
+        if (this.call <= 0) {
+            this.char.state = new RunningLeftState(this.char);
+        }
+    }
+    attack(type) {
+        this._rest();
+        this.call --;
+        if (this.call <= 0) {
+            this.char.state = new AttackingState(this.char, type);
+        }
+    }
+    interuptJump() {
+        /*this.call --;
+        if (this.call <= 0) {
+            this.char.state = new IdleState(this.char);
+        }*/
+    }
+}
+export class AscendingState {
+    constructor(char) {
+        this.char = char;
+        this.init();
+        console.log(this.constructor.name)
+    }
+    land(){
+        //this.char.state = new LandingState(this.char);
+    }
+    init() {
+        this.char.anims.play('jump_start');
+    }
+    rest() {}
+    jump(time) {
+        if (time < 285) {
+            this.char.body.setVelocityY(-250);
+        } else {
+            this.char.state = new DescendingState(this.char);
+        }
+    }
+    interuptJump() {
+        this.char.state = new DescendingState(this.char);
+    }
+    runRight() {
+        this.char.setAccelerationX(150);
+    }
+    runLeft() {
+        this.char.setAccelerationX(-150);
+    }
+    attack(type) {
+        this.char.state = new AttackingState(this.char, 'attackC');
+    }
 }
 export class DescendingState {
     constructor(char) {
         this.char = char;
         this.init();
+        console.log(this.constructor.name)
     }
     init() {
-        // animate ect..
+        this.interuptJump();
+        this.char.anims.play('jump_mid');
+    }
+    land(){
+        this.char.state = new LandingState(this.char);
     }
     rest() {}
     jump() {}
     runRight() {}
-    runleft() {}
-    attacking() {}
-}
-export class DescendingState {
-    constructor(char) {
-        this.char = char;
-        this.init();
+    runLeft() {}
+    attack(type) {
+        this.char.state = new AttackingState(this.char, 'attackC');
     }
-    init() {
-        // animate ect..
+    interuptJump() {
+        this.char.body.setAccelerationY(700);
     }
-    rest() {}
-    jump() {}
-    runRight() {}
-    runleft() {}
-    attacking() {}
 }
 export class IdleState {
     constructor(char) {
         this.char = char;
         this.init();
+        console.log(this.constructor.name)
     }
     init() {
-        this.char.anims.play(GrulitaFrames.idle.name);
+        this.char.anims.play('idle');
     }
+    land(){}
     rest() {
         this.char.body.setAccelerationX(0);
         if (this.char.body.velocity.x > 10) {
@@ -114,12 +264,13 @@ export class IdleState {
         this.char.state = new AscendingState(this.char);
     }
     runRight() {
-        this.char.state = new RunRightState(this.char);
+        this.char.state = new RunningRightState(this.char);
     }
-    runleft() {
-        this.char.state = new RunLeftState(this.char);
+    runLeft() {
+        this.char.state = new RunningLeftState(this.char);
     }
-    attacking() {
-        this.char.state = new AttackingState(this.char);
+    attack(type) {
+        this.char.state = new AttackingState(this.char, type);
     }
+    interuptJump() {}
 }

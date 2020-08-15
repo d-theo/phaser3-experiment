@@ -3,6 +3,7 @@ import Phaser from 'phaser'
 import {IMAGES} from '../frames';
 import {makeAnims} from '../animations/grulita';
 import {GrulitaFrames} from '../animations/_grulita';
+import {IdleState} from '../actors/behaviors/fsm_actions';
 
 export default class extends Phaser.Scene {
   constructor () {
@@ -39,8 +40,7 @@ export default class extends Phaser.Scene {
 
     this.player = this.physics.add.sprite(100, 100, 'grulita_atlas', 'idle01.png');
     this.player.body.setMaxVelocity(150, 500);
-    this.playerState = new IdleState(this.player);
-    //this.player.anims.play(GrulitaFrames.idle.name);
+    this.player.state = new IdleState(this.player);
 
     this.tilemap.setCollision([1,2,3], true, true, 'stage', true);
 
@@ -59,15 +59,25 @@ export default class extends Phaser.Scene {
 
   update(t,t2) {
     if (this.keys.left.isDown) {
-      if (this.player.state != 4) {
-        this.player.flipX = true;
-        this.player.anims.play(GrulitaFrames.run.name);
-        this.player.state = 4;
-      }
-      this.player.body.setAccelerationX(-130);
-      if (this.player.body.velocity.x > 10) {
-        this.player.body.setVelocityX(+12);
-      }
+      this.player.state.runLeft();
+    }
+    if (this.keys.right.isDown) {
+      this.player.state.runRight();
+    }
+    if(!this.keys.left.isDown && !this.keys.right.isDown) {
+      this.player.state.rest();
+    }
+    if (this.keys.up.isDown) {
+      this.player.state.jump(this.keys.up.getDuration());
+    }
+    if (this.keys.up.isUp) {
+      this.player.state.interuptJump();
+    }
+    if (this.isDown()) {
+      this.player.state.land();
+    }
+    if (this.keys.space.isDown) {
+      this.player.state.attack('attackA');
     }
   }
 
