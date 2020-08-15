@@ -1,0 +1,14 @@
+{ "columns":7,
+ "image":"..\/Downloads\/Magic-Cliffs-Environment\/PNG\/sea.png",
+ "imageheight":96,
+ "imagewidth":112,
+ "margin":0,
+ "name":"sea",
+ "spacing":0,
+ "tilecount":42,
+ "tiledversion":"1.2.5",
+ "tileheight":16,
+ "tilewidth":16,
+ "type":"tileset",
+ "version":1.2
+}

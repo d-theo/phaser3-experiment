@@ -1,0 +1,14 @@
+{ "columns":9,
+ "image":"..\/Downloads\/Magic-Cliffs-Environment\/PNG\/far-grounds.png",
+ "imageheight":110,
+ "imagewidth":616,
+ "margin":0,
+ "name":"far-grounds",
+ "spacing":0,
+ "tilecount":9,
+ "tiledversion":"1.2.5",
+ "tileheight":64,
+ "tilewidth":64,
+ "type":"tileset",
+ "version":1.2
+}
