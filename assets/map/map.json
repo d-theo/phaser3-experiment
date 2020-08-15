@@ -85,15 +85,6 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
-                {
-                 "id":39,
-                 "properties":[
-                        {
-                         "name":"collide",
-                         "type":"bool",
-                         "value":true
-                        }]
                 }],
          "tilewidth":18
         }],
