@@ -19,7 +19,7 @@ export class AttackingState {
             attackD : 350,
         }[type]
         this.attackLenght = len;
-        console.log(this.constructor.name);
+        //console.log(this.constructor.name);
 
         this.init();
     }
@@ -58,7 +58,7 @@ export class RunningLeftState {
     constructor(char) {
         this.char = char;
         this.init();
-        console.log(this.constructor.name)
+        //console.log(this.constructor.name)
     }
     init() {
         this.char.flipX = true;
@@ -89,7 +89,7 @@ export class RunningRightState {
     constructor(char) {
         this.char = char;
         this.init();
-        console.log(this.constructor.name)
+        //console.log(this.constructor.name)
     }
     init() {
         this.char.flipX = false;
@@ -117,9 +117,9 @@ export class RunningRightState {
 export class LandingState {
     constructor(char) {
         this.char = char;
-        this.call = 5;
+        this.call = 1;
         this.init();
-        console.log(this.constructor.name)
+        //console.log(this.constructor.name)
     }
     init() {
         this.char.setTexture('grulita_atlas', 'jump_landing.png')
@@ -131,9 +131,9 @@ export class LandingState {
     _rest() {
         this.char.body.setAccelerationX(0);
         if (this.char.body.velocity.x > 10) {
-            this.char.body.setVelocityX(this.char.body.velocity.x - 4);
+            this.char.body.setVelocityX(this.char.body.velocity.x - 30);
         } else if (this.char.body.velocity.x < -10) {
-            this.char.body.setVelocityX(this.char.body.velocity.x + 4);
+            this.char.body.setVelocityX(this.char.body.velocity.x + 30);
         } else {
             this.char.setVelocityX(0);
         }
@@ -187,7 +187,7 @@ export class AscendingState {
     constructor(char) {
         this.char = char;
         this.init();
-        console.log(this.constructor.name)
+        //console.log(this.constructor.name)
     }
     land(){
         //this.char.state = new LandingState(this.char);
@@ -220,7 +220,7 @@ export class DescendingState {
     constructor(char) {
         this.char = char;
         this.init();
-        console.log(this.constructor.name)
+        //console.log(this.constructor.name)
     }
     init() {
         this.interuptJump();
@@ -231,8 +231,12 @@ export class DescendingState {
     }
     rest() {}
     jump() {}
-    runRight() {}
-    runLeft() {}
+    runRight() {
+        this.char.setAccelerationX(+150);
+    }
+    runLeft() {
+        this.char.setAccelerationX(-150);
+    }
     attack(type) {
         this.char.state = new AttackingState(this.char, 'attackC');
     }
@@ -244,7 +248,7 @@ export class IdleState {
     constructor(char) {
         this.char = char;
         this.init();
-        console.log(this.constructor.name)
+        //console.log(this.constructor.name)
     }
     init() {
         this.char.anims.play('idle');
@@ -253,9 +257,9 @@ export class IdleState {
     rest() {
         this.char.body.setAccelerationX(0);
         if (this.char.body.velocity.x > 10) {
-            this.char.body.setVelocityX(this.char.body.velocity.x - 5);
+            this.char.body.setVelocityX(this.char.body.velocity.x - 9);
         } else if (this.char.body.velocity.x < -10) {
-            this.char.body.setVelocityX(this.char.body.velocity.x + 5);
+            this.char.body.setVelocityX(this.char.body.velocity.x + 9);
         } else {
             this.char.setVelocityX(0);
         }

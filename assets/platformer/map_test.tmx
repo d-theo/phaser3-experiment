@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.5" orientation="orthogonal" renderorder="right-down" width="200" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="11">
+<map version="1.2" tiledversion="1.2.5" orientation="orthogonal" renderorder="right-down" width="200" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="11" nextobjectid="53">
  <tileset firstgid="1" name="Tileset" tilewidth="16" tileheight="16" tilecount="48" columns="8">
   <image source="Tileset.png" width="128" height="96"/>
+  <tile id="5">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="21">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="49" name="clouds" tilewidth="16" tileheight="16" tilecount="476" columns="34">
   <image source="clouds.png" width="544" height="236"/>
@@ -14,6 +24,15 @@
  </tileset>
  <tileset firstgid="898" name="Decors" tilewidth="16" tileheight="16" tilecount="98" columns="14">
   <image source="Decors.png" width="224" height="112"/>
+ </tileset>
+ <tileset firstgid="996" name="collectibles" tilewidth="16" tileheight="14" tilecount="2" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0" type="diamond_big">
+   <image width="16" height="14" source="Collectible/diamond_big_01.png"/>
+  </tile>
+  <tile id="1">
+   <image width="8" height="7" source="Collectible/diamond_small.png"/>
+  </tile>
  </tileset>
  <layer id="7" name="sky" width="200" height="20" visible="0" locked="1">
   <data encoding="csv">
@@ -135,4 +154,36 @@
 1,1,1,1,1,1,1,1,1,6,6,6,6,6,6,6,6,6,6,0,0,6,6,6,6,0,0,0,0,0,0,6,6,6,0,0,9,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,6,6,6,6,6,6,6,6,14,14,14,14,14,10,10,10,10,21,2,20,10,10,11,0,0,9,10,10,21,2,2,2,20,10,11,0,22,22,0,0,22,22,0,0,22,0,0,0,5,2,2,6,6,6,6,6,6,6,6,6,6,6,6,11,0,0,17,18,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
 </data>
  </layer>
+ <objectgroup id="10" name="collectibles">
+  <object id="14" gid="996" x="15.4663" y="199.759" width="16" height="14"/>
+  <object id="15" gid="996" x="486.469" y="40.5233" width="16" height="14"/>
+  <object id="16" gid="996" x="519.992" y="24.5997" width="16" height="14"/>
+  <object id="17" gid="996" x="551.001" y="38.8471" width="16" height="14"/>
+  <object id="18" gid="997" x="684.904" y="51.6088" width="8" height="7"/>
+  <object id="19" gid="997" x="797.207" y="84.294" width="8" height="7"/>
+  <object id="20" gid="997" x="970.69" y="212.521" width="8" height="7"/>
+  <object id="21" gid="997" x="960.633" y="196.597" width="8" height="7"/>
+  <object id="22" gid="997" x="950.576" y="212.521" width="8" height="7"/>
+  <object id="23" gid="997" x="1156.74" y="210.006" width="8" height="7"/>
+  <object id="24" gid="997" x="1596.74" y="295.491" width="8" height="7"/>
+  <object id="25" gid="997" x="1662.11" y="294.653" width="8" height="7"/>
+  <object id="26" gid="997" x="1716.58" y="295.491" width="8" height="7"/>
+  <object id="28" gid="996" x="2240.38" y="105.349" width="16" height="14"/>
+  <object id="29" gid="997" x="2347.76" y="84.8378" width="8" height="7"/>
+  <object id="31" gid="997" x="2364.99" y="67.6088" width="8" height="7"/>
+  <object id="32" gid="997" x="2380.06" y="84.1199" width="8" height="7"/>
+  <object id="33" gid="996" x="2352.37" y="301.329" width="16" height="14"/>
+  <object id="35" gid="996" x="2863.77" y="31.7849" width="16" height="14"/>
+  <object id="36" gid="997" x="2763.6" y="292.829" width="8" height="7"/>
+  <object id="37" gid="997" x="2747.6" y="291.94" width="8" height="7"/>
+  <object id="38" gid="997" x="2755.6" y="275.048" width="8" height="7"/>
+  <object id="39" gid="997" x="2084.21" y="258.95" width="8" height="7"/>
+  <object id="40" gid="997" x="2166.38" y="228.727" width="8" height="7"/>
+  <object id="41" gid="997" x="2262.72" y="211.727" width="8" height="7"/>
+  <object id="43" gid="997" x="1299.95" y="297.736" width="8" height="7"/>
+  <object id="44" gid="997" x="1492.31" y="299.352" width="8" height="7"/>
+  <object id="45" gid="997" x="1176.02" y="209.908" width="8" height="7"/>
+  <object id="46" gid="997" x="1167.4" y="229.844" width="8" height="7"/>
+  <object id="47" gid="6" x="253.541" y="297.626" width="16" height="16"/>
+ </objectgroup>
 </map>

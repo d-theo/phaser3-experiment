@@ -1,7 +1,7 @@
-const file = require('./assets/grulita-atlas/texture.json');
+const file = require('./assets/grulita-atlas/grulita-collectibles/grulita-collectibles.json');
 const fs = require('fs');
 const prefixes = {};
-FILENAME = "grulita.json";
+FILENAME = "collectibles.json";
 function parse(file) {
     const root = file.textures[0].frames;
     for (let frame of root) {

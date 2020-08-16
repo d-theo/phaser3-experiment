@@ -120,4 +120,34 @@ export function makeAnims(scene) {
         duration: 350,
         repeat: 0,
       });
+
+
+      //// collectibles
+
+      scene.anims.create({
+        key: 'diamond_big',
+        frames: scene.anims.generateFrameNames('grulita_collectibles',{
+          prefix: 'diamond_big_0',
+          start:1,
+          end: 6,
+          suffix: '.png',
+        }),
+        // time
+        delay: 0,
+        duration: 1500,
+        // repeat
+        repeat: -1,
+      });
+      scene.anims.create({
+        key: 'diamond_small',
+        frames: scene.anims.generateFrameNames('grulita_collectibles',{
+          prefix: 'diamond_small0',
+          start:1,
+          end: 5,
+          suffix: '.png',
+        }),
+        duration: 1000,
+        // repeat
+        repeat: -1,
+      });
 }

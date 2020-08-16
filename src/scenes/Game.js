@@ -11,12 +11,17 @@ export default class extends Phaser.Scene {
   }
   init () {}
   preload () {
+    this.load.image('spark0', 'assets/images/blue.png');
+    this.load.image('spark1', 'assets/images/red.png');
+
     this.load.image('clouds', 'assets/platformer/clouds.png');
     this.load.image('BG3', 'assets/platformer/BG3.png');
     this.load.image('Decors', 'assets/platformer/Decors.png');
     this.load.image('Tileset', 'assets/platformer/Tileset.png');
     this.load.image('sky', 'assets/platformer/sky.png');
     this.load.atlas('grulita_atlas', './assets/grulita-atlas/grulita-idle.png', './assets/grulita-atlas/grulita-idle.json');
+    this.load.atlas('grulita_collectibles', './assets/grulita-atlas/grulita-collectibles/grulita-collectibles.png', './assets/grulita-atlas/grulita-collectibles/grulita-collectibles.json');
+    
     this.load.tilemapTiledJSON({
       key: 'tileMap',
       url: 'assets/platformer/map_grulita.json'
@@ -37,20 +42,23 @@ export default class extends Phaser.Scene {
     this.tilemap.createStaticLayer('stuff', decors, 0, 0);
     const ground = this.tilemap.createStaticLayer('stage', tileset, 0, 0);
     makeAnims(this);
-
+    this.makeParticle();
     this.player = this.physics.add.sprite(100, 100, 'grulita_atlas', 'idle01.png');
     this.player.body.setMaxVelocity(150, 500);
     this.player.state = new IdleState(this.player);
 
     this.tilemap.setCollision([1,2,3], true, true, 'stage', true);
+    this.tilemap.setCollisionByProperty({collide: true});
 
     this.physics.add.collider(this.player, ground);
 
     this.keys = this.input.keyboard.createCursorKeys();
-    this.canJump = true;
+
+    this.parseObjectLayers();
 
     this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
     this.cameras.main.startFollow(this.player);
+    this.game.scale.setZoom(2);
   }
   isDown() {
     return this.player.body.onFloor() ||
@@ -81,118 +89,62 @@ export default class extends Phaser.Scene {
     }
   }
 
-  tryupdate() {
-    if (this.keys.left.isDown) {
-      if (this.player.state != 4) {
-        this.player.flipX = true;
-        this.player.anims.play(GrulitaFrames.run.name);
-        this.player.state = 4;
-      }
-      this.player.body.setAccelerationX(-130);
-      if (this.player.body.velocity.x > 10) {
-        this.player.body.setVelocityX(+12);
-      }
-    } 
-    if (this.keys.right.isDown) {
-      if (this.player.state != 2) {
-        this.player.flipX = false;
-        this.player.anims.play(GrulitaFrames.run.name);
-        this.player.state = 2;
-      }
-      if (this.player.body.velocity.x < -10) {
-        this.player.body.setVelocityX(-12);
-      }
-      this.player.body.setAccelerationX(+130);
-    }
+  parseObjectLayers() {
+    const diamonds = this.tilemap.createFromObjects('collectibles', 997);
+    const diamondsBig = this.tilemap.createFromObjects('collectibles', 996);
 
-    if (this.keys.up.isDown) {
-      if (this.keys.up.getDuration() < 250 && this.canJump) {
-        if (this.player.state !== 1) {
-          console.log('play anim')
-          this.player.anims.play('jump_start');
-        }
-        this.player.state = 1;
-        this.player.body.setVelocityY(-250);
-      } else {
-        this.canJump = false;
-      }
-    }
-    if (this.keys.up.isUp) {
-      this.player.body.setAccelerationY(600);
-    }
-    if (this.isDown()) {
-      //this.player.state = 0;
-      console.log()
-      this.canJump = true;
-      //this.player.anims.play(GrulitaFrames.idle.name);
-    }
+    const diamondsGroup = this.physics.add.group({
+      immovable: true,
+      allowGravity: false,
+    });
+    diamondsGroup.addMultiple(diamondsBig);
+    diamondsGroup.addMultiple(diamonds);
 
-    if(!this.keys.left.isDown && !this.keys.right.isDown) {
-      if (this.player.state != 0 && this.player.state != 1) {
-         this.player.anims.play(GrulitaFrames.idle.name);
-         this.player.state = 0;
-      }
-      this.player.body.setAccelerationX(0);
-      if (this.player.body.velocity.x > 10) {
-        this.player.body.setVelocityX(this.player.body.velocity.x - 4);
-      } else if (this.player.body.velocity.x < -10) {
-        this.player.body.setVelocityX(this.player.body.velocity.x + 4);
-      } else {
-        this.player.setVelocityX(0);
-      }
-    }
+    diamonds.forEach(d => {
+      d.setScale(1,1);
+      d.anims.play('diamond_small');
+    });
+    diamondsBig.forEach(d => {
+      d.setScale(1,1);
+      d.anims.play('diamond_big');
+    });
+    this.physics.add.overlap(this.player, diamondsGroup, (_, diam) => {
+      console.log('overlap')
+      this.emitter0.setPosition(diam.x, diam.y);
+      this.emitter1.setPosition(diam.x, diam.y);
+      this.emitter0.active = true;
+      this.emitter1.active = true;
+      this.emitter0.explode();
+      this.emitter1.explode();
+      diam.destroy();
+    });
   }
 
-  loadMarioMap() {
-    this.load.image('map', 'assets/map/map.png'); // pour la tilemap
-    
-    this.load.spritesheet('sprite_map',  // pour les sprites
-        'assets/map/map.png',
-        { frameWidth: 18, frameHeight: 18 }
-    );
-
-    this.load.tilemapTiledJSON({
-      key: 'tileMap',
-      url: 'assets/map/map.json'
+  makeParticle() {
+    this.emitter0 = this.add.particles('spark0').createEmitter({
+      x: 400,
+      y: 300,
+      speed: { min: -800, max: 800 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.5, end: 0 },
+      blendMode: 'SCREEN',
+      active: false,
+      //lifespan: 600,
+      lifespan: 200,
+      gravityY: 800
     });
 
-    this.load.atlas('smb', './assets/smb-atlas/texture.png', './assets/smb-atlas/texture.json')
-  }
-  initMarioTilemap() {
-    this.tilemap = this.make.tilemap({key:'tileMap', tileWidth: 18, tileHeight:18});
-    const tileset = this.tilemap.addTilesetImage('map');
-    this.layer = this.tilemap.createDynamicLayer('ground', tileset, 0, 0); // check le json pour le layerName
-    this.layer.setCollisionByProperty({ collide: true });
-    
-    this.anims.create({
-      key: IMAGES.mario.walk.key,
-      frameRate: 10,
-      repeat: -1,
-      frames: this.anims.generateFrameNames('smb', IMAGES.mario.walk)
+    this.emitter1 = this.add.particles('spark1').createEmitter({
+        x: 400,
+        y: 300,
+        speed: { min: -800, max: 800 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.3, end: 0 },
+        blendMode: 'SCREEN',
+        active: false,
+        //lifespan: 300,
+        lifespan: 150,
+        gravityY: 800
     });
-    this.mario = this.physics.add.sprite(100,100,'smb', 'bend.png');
-    this.mario.body.setMaxVelocity(150, 500);
-    this.mario.anims.play(IMAGES.mario.walk.key);
-    
-   const chances = this.tilemap.createFromTiles(40, -1, {
-      key: 'smb', frame: 'bend.png'
-    });
-    const group = this.physics.add.group({immovable: true});
-    chances.forEach((c) => {
-      group.add(c);
-      c.setOrigin(0, 0);
-      c.body.moves = false;
-      c.body.immovable = true;
-    });
-    this.physics.add.collider(this.mario, group);
-    const tiles = this.layer.filterTiles((t) => {
-      if (t.index === 40) return true;
-    });
-    this.layer.forEachTile((t) => {
-      if (t.index === 40) //this.layer.removeTileAt(t.x, t.y, true, true);
-        this.tilemap.replaceByIndex(40, -1);
-    });
-    this.tilemap.removeTile(tiles, -1, true).forEach(t => t.destroy());
-    this.physics.add.collider(this.mario, this.layer);
   }
 }
