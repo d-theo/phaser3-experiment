@@ -24,7 +24,7 @@ export class AttackingState {
         this.init();
     }
     init() {
-        console.log(this.type);
+        this.char.setAccelerationX(0);
         this.char.anims.play(this.type);
         setTimeout(() => this.isFinished = true, this.attackLenght);
     }
@@ -253,9 +253,9 @@ export class IdleState {
     rest() {
         this.char.body.setAccelerationX(0);
         if (this.char.body.velocity.x > 10) {
-            this.char.body.setVelocityX(this.char.body.velocity.x - 4);
+            this.char.body.setVelocityX(this.char.body.velocity.x - 5);
         } else if (this.char.body.velocity.x < -10) {
-            this.char.body.setVelocityX(this.char.body.velocity.x + 4);
+            this.char.body.setVelocityX(this.char.body.velocity.x + 5);
         } else {
             this.char.setVelocityX(0);
         }
