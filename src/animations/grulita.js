@@ -121,6 +121,20 @@ export function makeAnims(scene) {
         repeat: 0,
       });
 
+      scene.anims.create({
+        key: 'hit_effect',
+        frames: scene.anims.generateFrameNames('grulita_atlas',{
+          prefix: 'hit_effect0',
+          start:1,
+          end: 5,
+          suffix: '.png',
+        }),
+        // time
+        delay: 0,
+        frameRate: 10,
+        repeat: 0,
+      });
+
 
       //// collectibles
 
@@ -147,6 +161,20 @@ export function makeAnims(scene) {
           suffix: '.png',
         }),
         duration: 1000,
+        // repeat
+        repeat: -1,
+      });
+
+      /// ENEMIES
+      scene.anims.create({
+        key: 'blob_idle',
+        frames: scene.anims.generateFrameNames('grulita_blob',{
+          prefix: 'blob_idle0',
+          start:1,
+          end: 16,
+          suffix: '.png',
+        }),
+        duration: 5000,
         // repeat
         repeat: -1,
       });

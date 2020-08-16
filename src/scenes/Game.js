@@ -1,8 +1,6 @@
 /* globals __DEV__ */
 import Phaser from 'phaser'
-import {IMAGES} from '../frames';
 import {makeAnims} from '../animations/grulita';
-import {GrulitaFrames} from '../animations/_grulita';
 import {IdleState} from '../actors/behaviors/fsm_actions';
 
 export default class extends Phaser.Scene {
@@ -23,7 +21,12 @@ export default class extends Phaser.Scene {
     this.load.image('sky', 'assets/platformer/sky.png');
     this.load.atlas('grulita_atlas', './assets/grulita-atlas/grulita-idle.png', './assets/grulita-atlas/grulita-idle.json');
     this.load.atlas('grulita_collectibles', './assets/grulita-atlas/grulita-collectibles/grulita-collectibles.png', './assets/grulita-atlas/grulita-collectibles/grulita-collectibles.json');
+    this.load.atlas('grulita_blob', './assets/grulita-atlas/grulita-enemies/grulita-blob.png', './assets/grulita-atlas/grulita-enemies/grulita-blob.json');
     
+    this.load.image('blob_idle', './assets/ennemies/blob/blob_idle000.png');
+    this.load.image('diam_big', './assets/platformer/Collectible/diamond_big.png');
+    this.load.image('diam_small', './assets/platformer/Collectible/diamond_small.png');
+
     this.load.tilemapTiledJSON({
       key: 'tileMap',
       url: 'assets/platformer/map_grulita.json'
@@ -44,15 +47,67 @@ export default class extends Phaser.Scene {
     this.tilemap.createStaticLayer('stuff', decors, 0, 0);
     const ground = this.tilemap.createStaticLayer('stage', tileset, 0, 0);
     makeAnims(this);
-    this.makeParticle();
+    this.makeParticle();  
     this.player = this.physics.add.sprite(100, 100, 'grulita_atlas', 'idle01.png');
     this.player.body.setMaxVelocity(150, 500);
     this.player.state = new IdleState(this.player);
 
+
+    this.blob = this.physics.add.sprite(200, 200, 'blob_idle');
+    this.blob.body.setMaxVelocity(150, 500);
+    this.blob.anims.play('blob_idle');
+
+    const blob = this.physics.add.sprite(300, 150, 'blob_idle');
+    blob.body.setMaxVelocity(150, 500);
+    blob.anims.play('blob_idle');
+
     this.tilemap.setCollision([1,2,3], true, true, 'stage', true);
     this.tilemap.setCollisionByProperty({collide: true});
 
-    this.physics.add.collider(this.player, ground);
+    this.physics.add.collider(this.player, ground, (player, tile) => {
+      //this.hit(tile);
+      //console.log('hit');
+    }, (player, tile) => {
+      /*const d = Math.abs(_chance.x*16 - (_mario.body.x+10));
+      if (d <= 3 && _mario.body.y >= _chance.y*16) {
+        this.deviateLeft(d);
+        return false;
+      }
+    
+      const pd = Math.abs((_chance.x+16)*16 - (_mario.body.x));
+      if (pd <= 3 && _mario.body.y >= _chance.y*16) {
+          this.deviateRight(pd);
+          return false;
+      }*/
+      return true;
+    });
+
+    this.physics.add.collider(this.blob, ground);
+    this.physics.add.collider(blob, ground);
+
+    this.hitEffect = this.add.sprite(0,0,'grulita_atlas','hit_effect01.png');
+    this.hitEffect.alpha = 0;
+    this.hitEffect.visible = 0;
+    this.hitEffect.setActive(false);
+    this.hitEffect.on('animationcomplete', () => {
+      this.hitEffect.alpha = 0;
+      this.hitEffect.visible = 0;
+      this.hitEffect.setActive(false);
+    });
+
+    this.physics.add.overlap(this.player, this.blob, (player, monster) => {
+      if (player.state.constructor.name === 'AttackingState') {
+        this.hit(monster);
+        monster.destroy();
+      }
+    });
+
+    this.physics.add.overlap(this.player, blob, (player, monster) => {
+      if (player.state.constructor.name === 'AttackingState') {
+        this.hit(monster);
+        monster.destroy();
+      }
+    });
 
     this.keys = this.input.keyboard.createCursorKeys();
 
@@ -62,6 +117,7 @@ export default class extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
     this.cameras.main.startFollow(this.player);
     this.game.scale.setZoom(2);
+
   }
   isDown() {
     return this.player.body.onFloor() ||
@@ -78,7 +134,7 @@ export default class extends Phaser.Scene {
     if(!this.keys.left.isDown && !this.keys.right.isDown) {
       this.player.state.rest();
     }
-    if (this.keys.up.isDown) {
+    if (this.keys.up.isDown && this.keys.up.getDuration() < 300) {
       this.player.state.jump(this.keys.up.getDuration());
     }
     if (this.keys.up.isUp) {
@@ -93,8 +149,8 @@ export default class extends Phaser.Scene {
   }
 
   parseObjectLayers() {
-    const diamonds = this.tilemap.createFromObjects('collectibles', 997);
-    const diamondsBig = this.tilemap.createFromObjects('collectibles', 996);
+    const diamonds = this.tilemap.createFromObjects('collectibles', 997, {key:'diam_small'});
+    const diamondsBig = this.tilemap.createFromObjects('collectibles', 996, {key:'diam_big'});
 
     const diamondsGroup = this.physics.add.group({
       immovable: true,
@@ -159,5 +215,31 @@ export default class extends Phaser.Scene {
         lifespan: 150,
         gravityY: 800
     });
+  }
+  hit(monster) {
+    this.hitEffect.setPosition(monster.x, monster.y);
+    this.hitEffect.alpha = 1;
+    this.hitEffect.visible = true;
+    this.hitEffect.setActive(true);
+    this.hitEffect.anims.play('hit_effect');
+  }
+
+  deviateLeft(by) {
+    console.log('left')
+    this.add.tween({
+      targets: this.player.sprite,
+      duration: 10,
+      ease: "linear",
+      x: '-='+50,
+  });
+  }
+  deviateRight(by) {
+    console.log('right')
+    this.add.tween({
+      targets: this.player.sprite,
+      duration: 10,
+      ease: "linear",
+      x: '+='+50,
+  });
   }
 }

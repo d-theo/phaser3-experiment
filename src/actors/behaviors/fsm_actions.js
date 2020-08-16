@@ -19,7 +19,7 @@ export class AttackingState {
             attackD : 350,
         }[type]
         this.attackLenght = len;
-        //console.log(this.constructor.name);
+        console.log(this.constructor.name);
 
         this.init();
     }
@@ -58,7 +58,7 @@ export class RunningLeftState {
     constructor(char) {
         this.char = char;
         this.init();
-        //console.log(this.constructor.name)
+        console.log(this.constructor.name)
     }
     init() {
         this.char.flipX = true;
@@ -89,7 +89,7 @@ export class RunningRightState {
     constructor(char) {
         this.char = char;
         this.init();
-        //console.log(this.constructor.name)
+        console.log(this.constructor.name)
     }
     init() {
         this.char.flipX = false;
@@ -107,7 +107,9 @@ export class RunningRightState {
         }
         this.char.body.setAccelerationX(+130);
     }
-    runLeft() {}
+    runLeft() {
+        this.char.state = new RunningLeftState(this.char);
+    }
     attack(type) {
         this.char.state = new AttackingState(this.char,type);
     }
@@ -119,7 +121,7 @@ export class LandingState {
         this.char = char;
         this.call = 1;
         this.init();
-        //console.log(this.constructor.name)
+        console.log(this.constructor.name)
     }
     init() {
         this.char.setTexture('grulita_atlas', 'jump_landing.png')
@@ -187,7 +189,7 @@ export class AscendingState {
     constructor(char) {
         this.char = char;
         this.init();
-        //console.log(this.constructor.name)
+        console.log(this.constructor.name)
     }
     land(){
         //this.char.state = new LandingState(this.char);
@@ -220,7 +222,7 @@ export class DescendingState {
     constructor(char) {
         this.char = char;
         this.init();
-        //console.log(this.constructor.name)
+        console.log(this.constructor.name)
     }
     init() {
         this.interuptJump();
@@ -248,7 +250,7 @@ export class IdleState {
     constructor(char) {
         this.char = char;
         this.init();
-        //console.log(this.constructor.name)
+        console.log(this.constructor.name)
     }
     init() {
         this.char.anims.play('idle');
