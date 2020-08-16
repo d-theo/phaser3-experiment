@@ -14,6 +14,8 @@ export default class extends Phaser.Scene {
     this.load.image('spark0', 'assets/images/blue.png');
     this.load.image('spark1', 'assets/images/red.png');
 
+    this.load.bitmapFont('font', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
+
     this.load.image('clouds', 'assets/platformer/clouds.png');
     this.load.image('BG3', 'assets/platformer/BG3.png');
     this.load.image('Decors', 'assets/platformer/Decors.png');
@@ -55,6 +57,7 @@ export default class extends Phaser.Scene {
     this.keys = this.input.keyboard.createCursorKeys();
 
     this.parseObjectLayers();
+    this.makeHUD();
 
     this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
     this.cameras.main.startFollow(this.player);
@@ -102,14 +105,16 @@ export default class extends Phaser.Scene {
 
     diamonds.forEach(d => {
       d.setScale(1,1);
+      d.state = 'small';
       d.anims.play('diamond_small');
     });
     diamondsBig.forEach(d => {
       d.setScale(1,1);
+      d.state = 'big';
       d.anims.play('diamond_big');
     });
     this.physics.add.overlap(this.player, diamondsGroup, (_, diam) => {
-      console.log('overlap')
+      this.updateScore(diam.state === 'big' ? 1000 : 100);
       this.emitter0.setPosition(diam.x, diam.y);
       this.emitter1.setPosition(diam.x, diam.y);
       this.emitter0.active = true;
@@ -119,7 +124,17 @@ export default class extends Phaser.Scene {
       diam.destroy();
     });
   }
-
+  updateScore(modif) {
+    this.score.pts += modif;
+    this.score.textObject.setText(('' + this.score.pts).padStart(6, '0'));
+  }
+  makeHUD() {
+    this.score = {
+      pts: 0,
+      textObject: this.add.bitmapText(5 * 8, 16, 'font', '000000', 8)
+    };
+    this.score.textObject.setScrollFactor(0, 0);
+  }
   makeParticle() {
     this.emitter0 = this.add.particles('spark0').createEmitter({
       x: 400,
@@ -129,7 +144,6 @@ export default class extends Phaser.Scene {
       scale: { start: 0.5, end: 0 },
       blendMode: 'SCREEN',
       active: false,
-      //lifespan: 600,
       lifespan: 200,
       gravityY: 800
     });
@@ -142,7 +156,6 @@ export default class extends Phaser.Scene {
         scale: { start: 0.3, end: 0 },
         blendMode: 'SCREEN',
         active: false,
-        //lifespan: 300,
         lifespan: 150,
         gravityY: 800
     });
