@@ -9,7 +9,7 @@ export default {
     default: "arcade",
     arcade: {
       gravity: { y: 475 },
-      debug: false
+      debug: true
     }
   },
   backgroundColor: "#f8f8f8",

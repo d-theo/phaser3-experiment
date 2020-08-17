@@ -48,9 +48,14 @@ export default class extends Phaser.Scene {
     const ground = this.tilemap.createStaticLayer('stage', tileset, 0, 0);
     makeAnims(this);
     this.makeParticle();  
-    this.player = this.physics.add.sprite(100, 100, 'grulita_atlas', 'idle01.png');
+    this.player = this.physics.add.sprite(100, 100, 'grulita_atlas', 'idle01.png') ;
     this.player.body.setMaxVelocity(150, 500);
-    this.player.state = new IdleState(this.player);
+    this.player.setOrigin(1,1);
+    console.log(this.player.originX)
+    //this.player.anchor.x = 0.3;
+    /*this.player.setBodySize(23, 40);
+    this.player.setOffset(10,20);*/
+    this.player.state = new IdleState(this.player); 
 
 
     this.blob = this.physics.add.sprite(200, 200, 'blob_idle');
