@@ -1,12 +1,3 @@
-/*
-Ascending
-Descending
-Landing
-Idle
-Running
-Attacking
-*/
-
 export class AttackingState {
     constructor(char, type) {
         this.isFinished = false;
@@ -74,7 +65,7 @@ export class RunningLeftState {
         this.char.state = new RunningRightState(this.char);
     }
     runLeft() {
-        this.char.body.setAccelerationX(-130);
+        this.char.body.setAccelerationX(-200);
         if (this.char.body.velocity.x > 10) {
             this.char.body.setVelocityX(+12);
         }
@@ -105,7 +96,7 @@ export class RunningRightState {
         if (this.char.body.velocity.x < -10) {
             this.char.body.setVelocityX(-12);
         }
-        this.char.body.setAccelerationX(+130);
+        this.char.body.setAccelerationX(+200);
     }
     runLeft() {
         this.char.state = new RunningLeftState(this.char);

@@ -47,16 +47,22 @@ export default class extends Phaser.Scene {
     this.tilemap.createStaticLayer('stuff', decors, 0, 0);
     const ground = this.tilemap.createStaticLayer('stage', tileset, 0, 0);
     makeAnims(this);
-    this.makeParticle();  
+    this.makeParticle();
     this.player = this.physics.add.sprite(100, 100, 'grulita_atlas', 'idle01.png') ;
-    this.player.body.setMaxVelocity(150, 500);
-    this.player.setOrigin(1,1);
-    console.log(this.player.originX)
-    //this.player.anchor.x = 0.3;
-    /*this.player.setBodySize(23, 40);
-    this.player.setOffset(10,20);*/
+    this.player.body.setMaxVelocity(110, 500);
+    this.player.setBodySize(23, 40);
+    this.player.setOffset(10,20);
     this.player.state = new IdleState(this.player); 
 
+    this.sword = this.physics.add.sprite(11,10);
+    this.sword.alpha = 0;
+    this.sword.setScale(1,1);
+    this.sword.setImmovable(true);
+    this.sword.setGravity(0,0);
+    this.sword.body.immovable = true;
+    this.sword.body.allowGravity = false;
+    this.sword.setBodySize(20, 30);
+    this.sword.setOffset(30, 10);
 
     this.blob = this.physics.add.sprite(200, 200, 'blob_idle');
     this.blob.body.setMaxVelocity(150, 500);
@@ -69,27 +75,12 @@ export default class extends Phaser.Scene {
     this.tilemap.setCollision([1,2,3], true, true, 'stage', true);
     this.tilemap.setCollisionByProperty({collide: true});
 
-    this.physics.add.collider(this.player, ground, (player, tile) => {
-      //this.hit(tile);
-      //console.log('hit');
-    }, (player, tile) => {
-      /*const d = Math.abs(_chance.x*16 - (_mario.body.x+10));
-      if (d <= 3 && _mario.body.y >= _chance.y*16) {
-        this.deviateLeft(d);
-        return false;
-      }
-    
-      const pd = Math.abs((_chance.x+16)*16 - (_mario.body.x));
-      if (pd <= 3 && _mario.body.y >= _chance.y*16) {
-          this.deviateRight(pd);
-          return false;
-      }*/
-      return true;
-    });
-
+    // todo refacto :)
+    this.physics.add.collider(this.player, ground);
     this.physics.add.collider(this.blob, ground);
     this.physics.add.collider(blob, ground);
 
+    // todo pool with groups / container
     this.hitEffect = this.add.sprite(0,0,'grulita_atlas','hit_effect01.png');
     this.hitEffect.alpha = 0;
     this.hitEffect.visible = 0;
@@ -101,18 +92,25 @@ export default class extends Phaser.Scene {
     });
 
     this.physics.add.overlap(this.player, this.blob, (player, monster) => {
-      if (player.state.constructor.name === 'AttackingState') {
-        this.hit(monster);
-        monster.destroy();
-      }
+      // todo
     });
 
     this.physics.add.overlap(this.player, blob, (player, monster) => {
-      if (player.state.constructor.name === 'AttackingState') {
+      // todo
+    });
+
+    this.physics.add.overlap(this.sword, this.blob, (_, monster) => {
+      if (this.player.state.constructor.name === 'AttackingState') {
         this.hit(monster);
         monster.destroy();
       }
-    });
+    })
+    this.physics.add.overlap(this.sword, blob, (_, monster) => {
+      if (this.player.state.constructor.name === 'AttackingState') {
+        this.hit(monster);
+        monster.destroy();
+      }
+    })
 
     this.keys = this.input.keyboard.createCursorKeys();
 
@@ -150,6 +148,7 @@ export default class extends Phaser.Scene {
     }
     if (this.keys.space.isDown) {
       this.player.state.attack('attackA');
+      this.onAttack();
     }
   }
 
@@ -228,23 +227,15 @@ export default class extends Phaser.Scene {
     this.hitEffect.setActive(true);
     this.hitEffect.anims.play('hit_effect');
   }
-
-  deviateLeft(by) {
-    console.log('left')
-    this.add.tween({
-      targets: this.player.sprite,
-      duration: 10,
-      ease: "linear",
-      x: '-='+50,
-  });
-  }
-  deviateRight(by) {
-    console.log('right')
-    this.add.tween({
-      targets: this.player.sprite,
-      duration: 10,
-      ease: "linear",
-      x: '+='+50,
-  });
+  onAttack() {
+    setTimeout(() => {
+      this.sword.setActive(false);
+    },350);
+    if (this.player.flipX === false) {
+      this.sword.setPosition(this.player.x, this.player.y);
+    } else {
+      this.sword.setPosition(this.player.x-47, this.player.y);
+    }
+    this.sword.setActive(true);
   }
 }
