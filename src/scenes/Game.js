@@ -131,7 +131,7 @@ export default class extends Phaser.Scene {
     if(!this.keys.left.isDown && !this.keys.right.isDown) {
       this.hero.state.rest();
     }
-    if (this.keys.up.isDown && this.keys.up.getDuration() < 300) {
+    if (this.keys.up.isDown && this.keys.up.getDuration() < 250) {
       this.hero.state.jump(this.keys.up.getDuration());
     }
     if (this.keys.up.isUp) {

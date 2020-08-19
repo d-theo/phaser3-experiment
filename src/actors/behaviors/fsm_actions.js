@@ -184,8 +184,8 @@ export class AscendingState {
     }
     rest() {}
     jump(time) {
-        if (time < 285) {
-            this.char.body.setVelocityY(-250);
+        if (time < 220) {
+            this.char.body.setVelocityY(-300);
         } else {
             this.char.state = new DescendingState(this.char);
         }

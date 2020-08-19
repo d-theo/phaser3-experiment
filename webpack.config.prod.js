@@ -21,13 +21,13 @@ module.exports = {
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true)
     }),
-    new Uglify(),
+    //new Uglify(),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './index.html',
       chunks: ['vendor', 'app'],
       chunksSortMode: 'manual',
-      minify: {
+      /*minify: {
         removeAttributeQuotes: true,
         collapseWhitespace: true,
         html5: true,
@@ -36,7 +36,7 @@ module.exports = {
         minifyURLs: true,
         removeComments: true,
         removeEmptyAttributes: true
-      },
+      },*/
       hash: true
     }),
     new CopyPlugin([
@@ -53,7 +53,7 @@ module.exports = {
       }
     ]
   },
-  mode:'production',
+  //mode:'production',
   optimization: {
     usedExports: true,
     splitChunks: {
