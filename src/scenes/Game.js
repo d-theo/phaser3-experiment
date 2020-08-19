@@ -1,16 +1,18 @@
 /* globals __DEV__ */
 import Phaser from 'phaser'
 import {makeAnims} from '../animations/grulita';
-import {IdleState} from '../actors/behaviors/fsm_actions';
+import { Grulita } from '../actors/behaviors/grulita';
 
 export default class extends Phaser.Scene {
   constructor () {
     super({ key: 'GameScene' })
   }
-  init () {}
+  init (x) {}
   preload () {
     this.load.image('spark0', 'assets/images/blue.png');
     this.load.image('spark1', 'assets/images/red.png');
+
+    this.load.image('hud_heart', 'assets/platformer/Collectible/heart02.png')
 
     this.load.bitmapFont('font', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
 
@@ -48,37 +50,60 @@ export default class extends Phaser.Scene {
     const ground = this.tilemap.createStaticLayer('stage', tileset, 0, 0);
     makeAnims(this);
     this.makeParticle();
-    this.player = this.physics.add.sprite(100, 100, 'grulita_atlas', 'idle01.png') ;
-    this.player.body.setMaxVelocity(110, 500);
-    this.player.setBodySize(23, 40);
-    this.player.setOffset(10,20);
-    this.player.state = new IdleState(this.player); 
+    this.hero = new Grulita(this);
+    this.diamondsGroup = this.physics.add.group({
+      immovable: true,
+      allowGravity: false,
+    });
+    this.fillCollectible(this.diamondsGroup);
 
-    this.sword = this.physics.add.sprite(11,10);
-    this.sword.alpha = 0;
-    this.sword.setScale(1,1);
-    this.sword.setImmovable(true);
-    this.sword.setGravity(0,0);
-    this.sword.body.immovable = true;
-    this.sword.body.allowGravity = false;
-    this.sword.setBodySize(20, 30);
-    this.sword.setOffset(30, 10);
-
-    this.blob = this.physics.add.sprite(200, 200, 'blob_idle');
-    this.blob.body.setMaxVelocity(150, 500);
-    this.blob.anims.play('blob_idle');
-
-    const blob = this.physics.add.sprite(300, 150, 'blob_idle');
-    blob.body.setMaxVelocity(150, 500);
-    blob.anims.play('blob_idle');
+    this.enemiesGroup = this.physics.add.group();
+    this.fillEnemies(this.enemiesGroup);
 
     this.tilemap.setCollision([1,2,3], true, true, 'stage', true);
     this.tilemap.setCollisionByProperty({collide: true});
 
-    // todo refacto :)
-    this.physics.add.collider(this.player, ground);
-    this.physics.add.collider(this.blob, ground);
-    this.physics.add.collider(blob, ground);
+    this.physics.add.collider(this.hero.grulita, ground, null, (grulita, ground) => {
+      const posX = this.hero.grulita.x;
+      const posTile = this.tilemap.tileToWorldXY(ground.x, ground.y);
+        if (grulita.body.x > ground.x && (posTile.x + 16) - (posX-10) < 5) {
+          return false;
+        }
+        else if (grulita.body.x < posTile.x) {
+          const xx = (posX+10) - (posTile.x);
+          if ((posX+10) - (posTile.x) < 5) {
+            return false;
+          } else {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      }
+    );
+
+    this.physics.add.collider(this.enemiesGroup, ground);
+    this.physics.add.overlap(this.hero.grulita, this.enemiesGroup, (grulita, _) => {
+      if (this.hero.invincible) return;
+      this.hero.takeHit();
+      this.tweens.add({
+        targets: grulita,
+        ease: 'Back',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+        duration: 500,
+        repeat: 0,
+        yoyo: false,
+        x: '-=20',
+        y: '-=5',
+      });
+      this.tweens.add({
+        targets: grulita,
+        alpha: { start: 0, to: 1 },
+        ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+        duration: 500,
+        repeat: 0,
+        yoyo: false,
+      });
+    })
 
     // todo pool with groups / container
     this.hitEffect = this.add.sprite(0,0,'grulita_atlas','hit_effect01.png');
@@ -91,75 +116,63 @@ export default class extends Phaser.Scene {
       this.hitEffect.setActive(false);
     });
 
-    this.physics.add.overlap(this.player, this.blob, (player, monster) => {
-      // todo
-    });
-
-    this.physics.add.overlap(this.player, blob, (player, monster) => {
-      // todo
-    });
-
-    this.physics.add.overlap(this.sword, this.blob, (_, monster) => {
-      if (this.player.state.constructor.name === 'AttackingState') {
+    this.physics.add.overlap(this.hero.sword, this.enemiesGroup, (_, monster) => {
+      if (this.hero.state.constructor.name === 'AttackingState') {
         this.hit(monster);
         monster.destroy();
       }
-    })
-    this.physics.add.overlap(this.sword, blob, (_, monster) => {
-      if (this.player.state.constructor.name === 'AttackingState') {
-        this.hit(monster);
-        monster.destroy();
-      }
-    })
+    });
+    this.physics.add.overlap(this.hero.grulita, this.diamondsGroup, (_, diam) => {
+      this.updateScore(diam.state === 'big' ? 1000 : 100);
+      this.emitter0.setPosition(diam.x, diam.y);
+      this.emitter1.setPosition(diam.x, diam.y);
+      this.emitter0.active = true;
+      this.emitter1.active = true;
+      this.emitter0.explode();
+      this.emitter1.explode();
+      diam.destroy();
+    });
+
 
     this.keys = this.input.keyboard.createCursorKeys();
-
-    this.parseObjectLayers();
     this.makeHUD();
 
     this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
-    this.cameras.main.startFollow(this.player);
+    this.cameras.main.startFollow(this.hero.grulita);
     this.game.scale.setZoom(2);
-
-  }
-  isDown() {
-    return this.player.body.onFloor() ||
-      this.player.body.blocked.down || this.player.body.touching.down
   }
 
   update(t,t2) {
     if (this.keys.left.isDown) {
-      this.player.state.runLeft();
+      this.hero.state.runLeft();
     }
     if (this.keys.right.isDown) {
-      this.player.state.runRight();
+      this.hero.state.runRight();
     }
     if(!this.keys.left.isDown && !this.keys.right.isDown) {
-      this.player.state.rest();
+      this.hero.state.rest();
     }
     if (this.keys.up.isDown && this.keys.up.getDuration() < 300) {
-      this.player.state.jump(this.keys.up.getDuration());
+      this.hero.state.jump(this.keys.up.getDuration());
     }
     if (this.keys.up.isUp) {
-      this.player.state.interuptJump();
+      this.hero.state.interuptJump();
     }
-    if (this.isDown()) {
-      this.player.state.land();
+    if (this.hero.isDown()) {
+      this.hero.state.land();
     }
     if (this.keys.space.isDown) {
-      this.player.state.attack('attackA');
-      this.onAttack();
+      this.hero.state.attack('attackA');
+      this.hero.onAttack();
     }
+    this.hero.update();
   }
 
-  parseObjectLayers() {
+  fillCollectible(diamondsGroup) {
     const diamonds = this.tilemap.createFromObjects('collectibles', 997, {key:'diam_small'});
     const diamondsBig = this.tilemap.createFromObjects('collectibles', 996, {key:'diam_big'});
 
-    const diamondsGroup = this.physics.add.group({
-      immovable: true,
-      allowGravity: false,
-    });
+    
     diamondsGroup.addMultiple(diamondsBig);
     diamondsGroup.addMultiple(diamonds);
 
@@ -173,27 +186,40 @@ export default class extends Phaser.Scene {
       d.state = 'big';
       d.anims.play('diamond_big');
     });
-    this.physics.add.overlap(this.player, diamondsGroup, (_, diam) => {
-      this.updateScore(diam.state === 'big' ? 1000 : 100);
-      this.emitter0.setPosition(diam.x, diam.y);
-      this.emitter1.setPosition(diam.x, diam.y);
-      this.emitter0.active = true;
-      this.emitter1.active = true;
-      this.emitter0.explode();
-      this.emitter1.explode();
-      diam.destroy();
+  }
+  fillEnemies(enemiesGroup) {
+    const blobs = this.tilemap.createFromObjects('ennemies', 999, {key: 'blob_idle'});
+    enemiesGroup.addMultiple(blobs);
+    blobs.forEach(blob => {
+      blob.anims.play('blob_idle');
     });
+
   }
   updateScore(modif) {
     this.score.pts += modif;
     this.score.textObject.setText(('' + this.score.pts).padStart(6, '0'));
   }
+  updateLife() {
+    for (let i = 0; i < 3; i++) {
+      if (this.hero.lifes > i)
+        this.lifes.container.list[i].setVisible(true);
+      else
+        this.lifes.container.list[i].setVisible(false);
+    }
+  }
   makeHUD() {
     this.score = {
       pts: 0,
-      textObject: this.add.bitmapText(5 * 8, 16, 'font', '000000', 8)
+      textObject: this.add.bitmapText(23, 10, 'font', '000000', 8).setScrollFactor(0, 0)
     };
-    this.score.textObject.setScrollFactor(0, 0);
+
+    this.lifes = {
+      container: this.add.container(30, 30, [
+        this.add.sprite(0, 0, 'hud_heart'),
+        this.add.sprite(15, 0, 'hud_heart'),
+        this.add.sprite(30, 0, 'hud_heart'),
+      ]).setScrollFactor(0,0)
+    };
   }
   makeParticle() {
     this.emitter0 = this.add.particles('spark0').createEmitter({
@@ -209,15 +235,15 @@ export default class extends Phaser.Scene {
     });
 
     this.emitter1 = this.add.particles('spark1').createEmitter({
-        x: 400,
-        y: 300,
-        speed: { min: -800, max: 800 },
-        angle: { min: 0, max: 360 },
-        scale: { start: 0.3, end: 0 },
-        blendMode: 'SCREEN',
-        active: false,
-        lifespan: 150,
-        gravityY: 800
+      x: 400,
+      y: 300,
+      speed: { min: -800, max: 800 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.3, end: 0 },
+      blendMode: 'SCREEN',
+      active: false,
+      lifespan: 150,
+      gravityY: 800
     });
   }
   hit(monster) {
@@ -226,16 +252,5 @@ export default class extends Phaser.Scene {
     this.hitEffect.visible = true;
     this.hitEffect.setActive(true);
     this.hitEffect.anims.play('hit_effect');
-  }
-  onAttack() {
-    setTimeout(() => {
-      this.sword.setActive(false);
-    },350);
-    if (this.player.flipX === false) {
-      this.sword.setPosition(this.player.x, this.player.y);
-    } else {
-      this.sword.setPosition(this.player.x-47, this.player.y);
-    }
-    this.sword.setActive(true);
   }
 }

@@ -15,8 +15,8 @@ export class AttackingState {
         this.init();
     }
     init() {
-        this.char.setAccelerationX(0);
-        this.char.anims.play(this.type);
+        this.char.body.setAccelerationX(0);
+        this.char.list[0].anims.play(this.type);
         setTimeout(() => this.isFinished = true, this.attackLenght);
     }
     rest() {
@@ -52,8 +52,8 @@ export class RunningLeftState {
         console.log(this.constructor.name)
     }
     init() {
-        this.char.flipX = true;
-        this.char.anims.play('run');
+        this.char.list[0].flipX = true;
+        this.char.list[0].anims.play('run');
     }
     rest() {
         this.char.state = new IdleState(this.char);
@@ -83,8 +83,8 @@ export class RunningRightState {
         console.log(this.constructor.name)
     }
     init() {
-        this.char.flipX = false;
-        this.char.anims.play("run");
+        this.char.list[0].flipX = false;
+        this.char.list[0].anims.play("run");
     }
     rest() {
         this.char.state = new IdleState(this.char);
@@ -115,7 +115,7 @@ export class LandingState {
         console.log(this.constructor.name)
     }
     init() {
-        this.char.setTexture('grulita_atlas', 'jump_landing.png')
+        this.char.list[0].setTexture('grulita_atlas', 'jump_landing.png')
 
         // TODO c moche
         this.char.body.setAccelerationX(0);
@@ -128,7 +128,7 @@ export class LandingState {
         } else if (this.char.body.velocity.x < -10) {
             this.char.body.setVelocityX(this.char.body.velocity.x + 30);
         } else {
-            this.char.setVelocityX(0);
+            this.char.body.setVelocityX(0);
         }
     }
     rest() {
@@ -169,12 +169,7 @@ export class LandingState {
             this.char.state = new AttackingState(this.char, type);
         }
     }
-    interuptJump() {
-        /*this.call --;
-        if (this.call <= 0) {
-            this.char.state = new IdleState(this.char);
-        }*/
-    }
+    interuptJump() {}
 }
 export class AscendingState {
     constructor(char) {
@@ -183,10 +178,9 @@ export class AscendingState {
         console.log(this.constructor.name)
     }
     land(){
-        //this.char.state = new LandingState(this.char);
     }
     init() {
-        this.char.anims.play('jump_start');
+        this.char.list[0].anims.play('jump_start');
     }
     rest() {}
     jump(time) {
@@ -200,10 +194,10 @@ export class AscendingState {
         this.char.state = new DescendingState(this.char);
     }
     runRight() {
-        this.char.setAccelerationX(150);
+        this.char.body.setAccelerationX(150);
     }
     runLeft() {
-        this.char.setAccelerationX(-150);
+        this.char.body.setAccelerationX(-150);
     }
     attack(type) {
         this.char.state = new AttackingState(this.char, 'attackC');
@@ -217,7 +211,7 @@ export class DescendingState {
     }
     init() {
         this.interuptJump();
-        this.char.anims.play('jump_mid');
+        this.char.list[0].anims.play('jump_mid');
     }
     land(){
         this.char.state = new LandingState(this.char);
@@ -225,10 +219,10 @@ export class DescendingState {
     rest() {}
     jump() {}
     runRight() {
-        this.char.setAccelerationX(+150);
+        this.char.body.setAccelerationX(+150);
     }
     runLeft() {
-        this.char.setAccelerationX(-150);
+        this.char.body.setAccelerationX(-150);
     }
     attack(type) {
         this.char.state = new AttackingState(this.char, 'attackC');
@@ -244,7 +238,7 @@ export class IdleState {
         console.log(this.constructor.name)
     }
     init() {
-        this.char.anims.play('idle');
+        this.char.list[0].anims.play('idle');
     }
     land(){}
     rest() {
@@ -254,7 +248,7 @@ export class IdleState {
         } else if (this.char.body.velocity.x < -10) {
             this.char.body.setVelocityX(this.char.body.velocity.x + 9);
         } else {
-            this.char.setVelocityX(0);
+            this.char.body.setVelocityX(0);
         }
     }
     jump() {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.5" orientation="orthogonal" renderorder="right-down" width="200" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="11" nextobjectid="53">
+<map version="1.2" tiledversion="1.2.5" orientation="orthogonal" renderorder="right-down" width="200" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="57">
  <tileset firstgid="1" name="Tileset" tilewidth="16" tileheight="16" tilecount="48" columns="8">
   <image source="Tileset.png" width="128" height="96"/>
   <tile id="5">
@@ -32,6 +32,18 @@
   </tile>
   <tile id="1">
    <image width="8" height="7" source="Collectible/diamond_small.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="998" name="ennemies" tilewidth="24" tileheight="21" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="24" height="21" source="../ennemies/blob/blob_idle011.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="999" name="blob_idle" tilewidth="24" tileheight="21" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="24" height="21" source="../ennemies/blob/blob_idle011.png"/>
   </tile>
  </tileset>
  <layer id="7" name="sky" width="200" height="20" visible="0" locked="1">
@@ -185,5 +197,11 @@
   <object id="45" gid="997" x="1176.02" y="209.908" width="8" height="7"/>
   <object id="46" gid="997" x="1167.4" y="229.844" width="8" height="7"/>
   <object id="47" gid="6" x="253.541" y="297.626" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="11" name="ennemies">
+  <object id="53" gid="999" x="253" y="223" width="24" height="21"/>
+  <object id="54" gid="999" x="458" y="254" width="24" height="21"/>
+  <object id="55" gid="999" x="870" y="301" width="24" height="21"/>
+  <object id="56" gid="999" x="548" y="47" width="24" height="21"/>
  </objectgroup>
 </map>
