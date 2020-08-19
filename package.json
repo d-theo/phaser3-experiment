@@ -6,8 +6,13 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack",
+<<<<<<< HEAD
     "deploy": "webpack --config webpack.config.prod.js",
     "extrude": "tile-extruder --tileWidth 16 --tileHeight 16 --input ./assets/platformer/Tileset.png --output ./assets/platformer/Tileset2.png"
+=======
+    "extrude": "tile-extruder --tileWidth 16 --tileHeight 16 --input ./assets/platformer/Tileset.png --output ./assets/platformer/Tileset2.png",
+    "deploy": "webpack --config webpack.config.prod.js"
+>>>>>>> extruder
   },
   "license": "MIT",
   "devDependencies": {
