@@ -7,40 +7,15 @@ export default class extends Phaser.Scene {
   constructor () {
     super({ key: 'GameScene' })
   }
-  init (x) {}
-  preload () {
-    this.load.image('spark0', 'assets/images/blue.png');
-    this.load.image('spark1', 'assets/images/red.png');
-
-    this.load.image('hud_heart', 'assets/platformer/Collectible/heart02.png')
-
-    this.load.bitmapFont('font', 'assets/fonts/font.png', 'assets/fonts/font.fnt');
-
-    this.load.image('clouds', 'assets/platformer/clouds.png');
-    this.load.image('BG3', 'assets/platformer/BG3.png');
-    this.load.image('Decors', 'assets/platformer/Decors.png');
-    this.load.image('Tileset', 'assets/platformer/Tileset.png');
-    this.load.image('sky', 'assets/platformer/sky.png');
-    this.load.atlas('grulita_atlas', './assets/grulita-atlas/grulita-idle.png', './assets/grulita-atlas/grulita-idle.json');
-    this.load.atlas('grulita_collectibles', './assets/grulita-atlas/grulita-collectibles/grulita-collectibles.png', './assets/grulita-atlas/grulita-collectibles/grulita-collectibles.json');
-    this.load.atlas('grulita_blob', './assets/grulita-atlas/grulita-enemies/grulita-blob.png', './assets/grulita-atlas/grulita-enemies/grulita-blob.json');
-    
-    this.load.image('blob_idle', './assets/ennemies/blob/blob_idle000.png');
-    this.load.image('diam_big', './assets/platformer/Collectible/diamond_big.png');
-    this.load.image('diam_small', './assets/platformer/Collectible/diamond_small.png');
-
-    this.load.tilemapTiledJSON({
-      key: 'tileMap',
-      url: 'assets/platformer/map_grulita.json'
-    });
-  }
+  
+  preload () {}
 
   create () {
     this.tilemap = this.make.tilemap({key:'tileMap', tileWidth: 18, tileHeight:18});
     const clouds = this.tilemap.addTilesetImage('clouds');
     const fields = this.tilemap.addTilesetImage('BG3');
     const skys = this.tilemap.addTilesetImage('sky');
-    const tileset = this.tilemap.addTilesetImage('Tileset');
+    const tileset = this.tilemap.addTilesetImage('Tileset', 'Tileset', 16, 16, 1, 2);
     const decors = this.tilemap.addTilesetImage('Decors');
 
     this.tilemap.createStaticLayer('sky', skys, 0, 0);
@@ -139,7 +114,11 @@ export default class extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
     this.cameras.main.startFollow(this.hero.grulita);
-    this.game.scale.setZoom(2);
+    //this.game.scale.setZoom(2);
+    /*setTimeout(() => {
+      this.scene.restart()
+    }, 5000);*/
+
   }
 
   update(t,t2) {
@@ -200,6 +179,9 @@ export default class extends Phaser.Scene {
     this.score.textObject.setText(('' + this.score.pts).padStart(6, '0'));
   }
   updateLife() {
+    if (this.hero.lifes == 0) {
+      this.die();
+    }
     for (let i = 0; i < 3; i++) {
       if (this.hero.lifes > i)
         this.lifes.container.list[i].setVisible(true);
@@ -252,5 +234,9 @@ export default class extends Phaser.Scene {
     this.hitEffect.visible = true;
     this.hitEffect.setActive(true);
     this.hitEffect.anims.play('hit_effect');
+  }
+  die() {
+    this.scene.stop();
+    this.scene.start('GameOverScene')
   }
 }

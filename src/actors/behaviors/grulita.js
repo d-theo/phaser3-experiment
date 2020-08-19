@@ -53,6 +53,9 @@ export class Grulita {
               this.sword.setPosition(this.grulita.x-47, this.grulita.y);
             }
         }
+        if (this.grulita.y > 330) {
+            this.scene.die();
+        }
     }
     isDown() {
         return this.grulita.body.onFloor()

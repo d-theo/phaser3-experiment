@@ -2,6 +2,9 @@ import Phaser from 'phaser'
 
 export default {
   type: Phaser.AUTO,
+  scale: {
+    mode: Phaser.Scale.ENVELOP,
+  },
   parent: 'content',
   width: 800,
   height: 600,
@@ -9,9 +12,9 @@ export default {
     default: "arcade",
     arcade: {
       gravity: { y: 475 },
-      debug: true
+      debug: false
     }
   },
-  backgroundColor: "#f8f8f8",
+  backgroundColor: "#111",
   render: { pixelArt: true, antialias: false }
 }

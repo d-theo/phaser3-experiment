@@ -2,12 +2,47 @@
 <map version="1.2" tiledversion="1.2.5" orientation="orthogonal" renderorder="right-down" width="200" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="57">
  <tileset firstgid="1" name="Tileset" tilewidth="16" tileheight="16" tilecount="48" columns="8">
   <image source="Tileset.png" width="128" height="96"/>
+  <tile id="3">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
   <tile id="5">
    <properties>
     <property name="collide" type="bool" value="true"/>
    </properties>
   </tile>
+  <tile id="19">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
   <tile id="21">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="29">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="30">
+   <properties>
+    <property name="collide" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="31">
    <properties>
     <property name="collide" type="bool" value="true"/>
    </properties>
